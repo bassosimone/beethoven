@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"text/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"text/template"
 )
 
 type SpecArgument struct {
@@ -24,7 +24,7 @@ type Spec struct {
 	Arguments   map[string]SpecArgument
 }
 
-func make_filepath(home string, name string) (string) {
+func make_filepath(home string, name string) string {
 	return filepath.Join(home, "spec", runtime.GOOS, name) + ".json"
 }
 
@@ -43,7 +43,7 @@ func SpecLoad(neubot_home string, nettest_name string) (Spec, error) {
 }
 
 func SpecCmdline(spec Spec, arguments map[string]string) (
-		[]string, error) {
+	[]string, error) {
 	cmdline := make([]string, len(spec.CommandLine))
 
 	for skey, svalue := range spec.Arguments {

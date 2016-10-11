@@ -19,7 +19,7 @@ func CmdRunMain() {
 	display_help := getopt.BoolLong("help", 'h', "Display help")
 
 	os.Args = os.Args[1:]
-	if err:= getopt.Getopt(nil); err != nil {
+	if err := getopt.Getopt(nil); err != nil {
 		fmt.Printf("%s\n", run_usage)
 		os.Exit(1)
 	}
@@ -52,7 +52,6 @@ func CmdRunMain() {
 
 	err := DirectorRun(*neubot_home, nettest_name, properties_map)
 	if err != nil {
-		fmt.Printf("error: %s\n", err)
 		os.Exit(1)
 	}
 }
