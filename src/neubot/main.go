@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"neubot/common"
 	"os"
 	"time"
 )
@@ -31,7 +32,7 @@ func main() {
 			os.Exit(0)
 		}
 		if os.Args[1] == "--version" {
-			fmt.Printf("%s\n", Version)
+			fmt.Printf("%s\n", common.Version)
 			os.Exit(0)
 		}
 		// FALLTHROUGH
