@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"neubot/cmdline"
 	"neubot/common"
 	"os"
 	"time"
@@ -39,12 +40,12 @@ func main() {
 	}
 
 	if os.Args[1] == "agent" {
-		CmdAgentMain()
+		cmdline.CmdAgentMain()
 		os.Exit(0)
 	}
 
 	if os.Args[1] == "run" {
-		CmdRunMain()
+		cmdline.CmdRunMain()
 		os.Exit(0)
 	}
 
