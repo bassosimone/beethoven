@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"neubot/common"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -79,7 +80,7 @@ func SpecCmdline(spec Spec, arguments map[string]string) (
 	}
 	arguments["cwd"] = cwd
 
-	python, err := DefaultPython()
+	python, err := common.DefaultPython()
 	if err == nil {
 		arguments["python"] = python
 	}

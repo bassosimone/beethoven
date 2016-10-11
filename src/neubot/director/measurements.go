@@ -4,17 +4,18 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"neubot/common"
 )
 
 func MeasurementsAppend(runner *Runner) error {
 
-	database, err := sql.Open("sqlite3", DefaultMeasurementsDb())
+	database, err := sql.Open("sqlite3", common.DefaultMeasurementsDb())
 	if err != nil {
 		return err
 	}
 	defer database.Close()
 
-	log.Printf("database %s openned\n", DefaultMeasurementsDb())
+	log.Printf("database %s openned\n", common.DefaultMeasurementsDb())
 
 	_, err = database.Exec(`
 		CREATE TABLE IF NOT EXISTS measurements(

@@ -1,4 +1,4 @@
-package director
+package common
 
 import (
 	"os/exec"

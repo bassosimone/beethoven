@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pborman/getopt"
 	"log"
+	"neubot/common"
 	"neubot/director"
 	"os"
 	"strings"
@@ -15,7 +16,7 @@ const run_usage = `usage:
 
 func CmdRunMain() {
 	properties := getopt.List('D', "Set test specific properties")
-	neubot_home := getopt.String('d', director.DefaultNeubotHome(),
+	neubot_home := getopt.String('d', common.DefaultNeubotHome(),
 		"Set Neubot home")
 	verbose := getopt.Bool('v', "Be verbose")
 	display_help := getopt.BoolLong("help", 'h', "Display help")
