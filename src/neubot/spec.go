@@ -20,7 +20,7 @@ type SpecArgument struct {
 }
 
 type Spec struct {
-	CommandLine string
+	CommandLine []string
 	Arguments   map[string]SpecArgument
 }
 
@@ -42,7 +42,9 @@ func SpecLoad(neubot_home string, nettest_name string) (Spec, error) {
 	return spec, nil
 }
 
-func SpecCmdline(spec Spec, arguments map[string]string) (string, error) {
+func SpecCmdline(spec Spec, arguments map[string]string) (
+		[]string, error) {
+	cmdline := make([]string, len(spec.CommandLine))
 
 	for skey, svalue := range spec.Arguments {
 		if _, found := arguments[skey]; !found {
@@ -55,25 +57,25 @@ func SpecCmdline(spec Spec, arguments map[string]string) (string, error) {
 		log.Printf("checking key %s, value %s\n", akey, avalue)
 		svalue, found := spec.Arguments[akey]
 		if !found {
-			return "", errors.New("unmapped argument: " + akey)
+			return cmdline, errors.New("unmapped argument: " + akey)
 		}
 		log.Printf("validating regexp: '%s'", svalue.Regexp)
 		if svalue.Regexp == "" {
-			return "", errors.New("missing regexp for: " + akey)
+			return cmdline, errors.New("missing regexp for: " + akey)
 		}
 		matched, err := regexp.MatchString(svalue.Regexp, avalue)
 		if err != nil {
-			return "", err
+			return cmdline, err
 		}
 		if !matched {
-			return "", errors.New("regexp does not match for: " + akey)
+			return cmdline, errors.New("regexp does not match for: " + akey)
 		}
 		log.Printf("Argument okay")
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return cmdline, err
 	}
 	arguments["cwd"] = cwd
 
@@ -82,17 +84,20 @@ func SpecCmdline(spec Spec, arguments map[string]string) (string, error) {
 		arguments["python"] = python
 	}
 
-	log.Printf("cmdline: %s\n", spec.CommandLine)
-	tmpl, err := template.New("Main").Parse(spec.CommandLine)
-	if err != nil {
-		return "", err
-	}
-	tmpl.Option("missingkey=error")
-	output := bytes.NewBufferString("")
-	err = tmpl.Execute(output, arguments)
-	if err != nil {
-		return "", err
+	log.Printf("spec command line: %s\n", spec.CommandLine)
+	for index, argument := range spec.CommandLine {
+		tmpl, err := template.New("Main").Parse(argument)
+		if err != nil {
+			return cmdline, err
+		}
+		tmpl.Option("missingkey=error")
+		output := bytes.NewBufferString("")
+		err = tmpl.Execute(output, arguments)
+		if err != nil {
+			return cmdline, err
+		}
+		cmdline[index] = output.String()
 	}
 
-	return output.String(), nil
+	return cmdline, nil
 }

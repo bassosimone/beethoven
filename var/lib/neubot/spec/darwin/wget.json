@@ -1,9 +1,14 @@
 {
-    "CommandLine": "wget -O/dev/null -d {{.url}}",
-    "Arguments": {
-        "url": {
-            "Label": "URL to download",
-            "Regexp": "^https?://[a-zA-Z0-9_.-]+(:[0-9]+)?/.*$"
-        }
+  "CommandLine": [
+    "wget",
+    "-O/dev/null",
+    "-d",
+    "{{.url}}"
+  ],
+  "Arguments": {
+    "url": {
+      "Label": "URL to download",
+      "Regexp": "^https?://[a-zA-Z0-9_.-]+(:[0-9]+)?/.*$"
     }
+  }
 }

@@ -1,4 +1,10 @@
 {
-    "CommandLine": "{{.python}} {{.cwd}}/usr/share/neubot/neubot_legacy/neubot/runner_core.py -v --force-privacy speedtest",
-    "Arguments": {}
+  "CommandLine": [
+    "{{.python}}",
+    "{{.cwd}}/usr/share/neubot/neubot_legacy/neubot/runner_core.py",
+    "-v",
+    "--force-privacy",
+    "speedtest"
+  ],
+  "Arguments": {}
 }
