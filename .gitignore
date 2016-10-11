@@ -26,3 +26,6 @@ _testmain.go
 # The final executable
 /neubot
 /src/github.com
+
+# Annoying sys-specific files
+.DS_Store

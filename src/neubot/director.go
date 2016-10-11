@@ -18,5 +18,11 @@ func DirectorRun(neubot_home string, nettest_name string,
 		return err
 	}
 	log.Printf("cmdline: %s\n", cmdline)
-	return RunnerExec(nettest_name, cmdline)
+	runner, err := RunnerStart(nettest_name, cmdline, DefaultWorkdir())
+	if err != nil {
+		return err
+	}
+	log.Printf("command running")
+	channel := RunnerWait(runner, DefaultProcTimeout())
+	return <-channel
 }
