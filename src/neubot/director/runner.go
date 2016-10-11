@@ -113,6 +113,8 @@ again:
 		}
 		done <- err
 	}
+	// Call periodic one last time to read what may have been written
+	// before exiting and therefore could still be in the buffers
 	periodic()
 	return done
 }
