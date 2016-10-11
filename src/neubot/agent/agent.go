@@ -7,9 +7,11 @@ import (
 
 func Run(address string, port int, verbose bool) {
 	m := martini.Classic()
-	m.Get("/", func() string {
-		return "Hello world!"
+
+	m.Group("/api", func(r martini.Router) {
+		r.Get("/runner", ApiRunnerGet);
 	})
+
 	endpoint := fmt.Sprintf("%s:%d", address, port)
 	m.RunOnAddr(endpoint)
 }
