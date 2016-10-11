@@ -30,13 +30,6 @@ func save_cmdline(runner *Runner, cmdline []string) error {
 
 func open_file(runner *Runner, file_type string) (
 	*os.File, error) {
-	if runner.TestId == "" {
-		test_id, err := uuid.NewV4()
-		if err != nil {
-			return nil, err
-		}
-		runner.TestId = test_id.String()
-	}
 	prefix := runner.TestName + "-" + file_type + "-" + runner.TestId
 	file, err := ioutil.TempFile(runner.Workdir, prefix)
 	if err != nil {
@@ -59,6 +52,11 @@ func RunnerStart(nettest_name string, cmdline []string, workdir string) (
 	runner.Process = exec.Command(cmdline[0])
 	runner.Process.Args = cmdline
 	runner.Workdir = workdir
+	test_id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+	runner.TestId = test_id.String()
 	stdout, err := open_file(&runner, "stdout")
 	if err != nil {
 		return nil, err
