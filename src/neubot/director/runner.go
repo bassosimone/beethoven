@@ -17,7 +17,7 @@ type Runner struct {
 	StderrPath string
 	Timestamp  time.Time
 	TestName   string
-	TestId	   string
+	TestId     string
 	Workdir    string
 	CmdLine    []byte
 }
