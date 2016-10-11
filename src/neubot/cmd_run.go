@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pborman/getopt"
 	"log"
+	"neubot/director"
 	"os"
 	"strings"
 )
@@ -14,7 +15,8 @@ const run_usage = `usage:
 
 func CmdRunMain() {
 	properties := getopt.List('D', "Set test specific properties")
-	neubot_home := getopt.String('d', DefaultNeubotHome(), "Set Neubot home")
+	neubot_home := getopt.String('d', director.DefaultNeubotHome(),
+		"Set Neubot home")
 	verbose := getopt.Bool('v', "Be verbose")
 	display_help := getopt.BoolLong("help", 'h', "Display help")
 
@@ -50,7 +52,7 @@ func CmdRunMain() {
 		os.Exit(0)
 	}
 
-	err := DirectorRun(*neubot_home, nettest_name, properties_map)
+	err := director.DirectorRun(*neubot_home, nettest_name, properties_map)
 	if err != nil {
 		log.Printf("DirectorRun failed: %s\n", err)
 		os.Exit(1)

@@ -1,11 +1,10 @@
-package main
+package director
 
 import (
 	"encoding/json"
 	"errors"
 	"github.com/nu7hatch/gouuid"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"time"
