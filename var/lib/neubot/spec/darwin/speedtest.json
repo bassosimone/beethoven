@@ -1,0 +1,4 @@
+{
+    "command_line": "{python} {pwd}/usr/share/neubot/neubot_legacy/neubot/runner_core.py -v --force-privacy speedtest",
+    "arguments": {}
+}
