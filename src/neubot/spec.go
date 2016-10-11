@@ -76,7 +76,11 @@ func SpecCmdline(spec Spec, arguments map[string]string) (string, error) {
 		return "", err
 	}
 	arguments["cwd"] = cwd
-	arguments["python"] = DefaultPython()
+
+	python, err := DefaultPython()
+	if err == nil {
+		arguments["python"] = python
+	}
 
 	log.Printf("cmdline: %s\n", spec.CommandLine)
 	tmpl, err := template.New("Main").Parse(spec.CommandLine)
@@ -91,8 +95,4 @@ func SpecCmdline(spec Spec, arguments map[string]string) (string, error) {
 	}
 
 	return output.String(), nil
-}
-
-func SpecRunSync(spec Spec) error {
-	return nil
 }

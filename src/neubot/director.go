@@ -18,5 +18,5 @@ func DirectorRun(neubot_home string, nettest_name string,
 		return err
 	}
 	log.Printf("cmdline: %s\n", cmdline)
-	return SpecRunSync(spec)
+	return RunnerExec(nettest_name, cmdline)
 }
