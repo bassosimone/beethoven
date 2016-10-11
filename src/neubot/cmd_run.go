@@ -50,7 +50,7 @@ func CmdRunMain() {
 		os.Exit(0)
 	}
 
-	err := DirectorRun(*neubot_home, nettest_name)
+	err := DirectorRun(*neubot_home, nettest_name, properties_map)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		os.Exit(1)
