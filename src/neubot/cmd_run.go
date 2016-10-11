@@ -52,6 +52,7 @@ func CmdRunMain() {
 
 	err := DirectorRun(*neubot_home, nettest_name, properties_map)
 	if err != nil {
+		log.Printf("DirectorRun failed: %s\n", err)
 		os.Exit(1)
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func StreamingOpenStderr(runner Runner) (*os.File, error) {
+func StreamingOpenStderr(runner *Runner) (*os.File, error) {
 	filep, err := os.Open(runner.StderrPath)
 	if err != nil {
 		log.Printf("cannot open: %s", runner.StderrPath)

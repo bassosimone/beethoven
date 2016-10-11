@@ -6,34 +6,37 @@ import (
 )
 
 func DirectorStart(neubot_home string, nettest_name string,
-	arguments map[string]string) (Runner, error) {
-	var runner Runner
+	arguments map[string]string) (*Runner, error) {
 	log.Printf("neubot_home: %s\n", neubot_home)
 	log.Printf("nettest_name: %s\n", nettest_name)
 	log.Printf("arguments: %s\n", arguments)
 	spec, err := SpecLoad(neubot_home, nettest_name)
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
 	cmdline, err := SpecCmdline(spec, arguments)
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
 	log.Printf("cmdline: %s\n", cmdline)
-	runner, err = RunnerStart(nettest_name, cmdline, DefaultWorkdir())
+	runner, err := RunnerStart(nettest_name, cmdline, DefaultWorkdir())
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
 	log.Printf("command running")
 	return runner, nil
 }
 
-func DirectorWaitAsync(runner Runner, callback func(Runner)) chan error {
+func DirectorWaitAsync(runner *Runner, callback func()) chan error {
 	channel := make(chan error, 1)
 	go func() {
 		err := <-RunnerWaitAsync(runner, DefaultProcTimeout(), callback)
 		if err != nil {
-			log.Printf("Command exit status: %s\n", err)
+			log.Printf("Command failed: %s\n", err)
+		}
+		err2 := MeasurementsAppend(runner)
+		if err == nil && err2 != nil {
+			err = err2
 		}
 		channel <- err
 	}()
@@ -50,7 +53,7 @@ func DirectorRun(neubot_home string, nettest_name string,
 	if err != nil {
 		return err
 	}
-	channel := DirectorWaitAsync(runner, func(runner Runner) {
+	channel := DirectorWaitAsync(runner, func() {
 		StreamingForward(stderr, os.Stderr)
 	})
 	err = <-channel

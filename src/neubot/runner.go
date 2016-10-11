@@ -1,78 +1,99 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/nu7hatch/gouuid"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"time"
 )
 
-func open_file(workdir string, nettest_name string, file_type string) (
+type Runner struct {
+	Process    *exec.Cmd
+	Status     string
+	StdoutPath string
+	StderrPath string
+	Timestamp  time.Time
+	TestName   string
+	TestId	   string
+	Workdir    string
+	CmdLine    []byte
+}
+
+func save_cmdline(runner *Runner, cmdline []string) error {
+	s, err := json.Marshal(cmdline)
+	runner.CmdLine = s
+	return err
+}
+
+func open_file(runner *Runner, file_type string) (
 	*os.File, error) {
-	uuid4, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
+	if runner.TestId == "" {
+		test_id, err := uuid.NewV4()
+		if err != nil {
+			return nil, err
+		}
+		runner.TestId = test_id.String()
 	}
-	prefix := "neubot-" + nettest_name + "-" + file_type + "-" + uuid4.String()
-	file, err := ioutil.TempFile(workdir, prefix)
+	prefix := runner.TestName + "-" + file_type + "-" + runner.TestId
+	file, err := ioutil.TempFile(runner.Workdir, prefix)
 	if err != nil {
 		return nil, err
 	}
 	return file, nil
 }
 
-type Runner struct {
-	Error      error
-	Process    *exec.Cmd
-	Status     string
-	StdoutPath string
-	StderrPath string
-}
-
 func RunnerStart(nettest_name string, cmdline []string, workdir string) (
-	Runner, error) {
+	*Runner, error) {
 	var runner Runner
+	runner.TestName = nettest_name
 	if len(cmdline) == 0 {
-		return runner, errors.New("invalid command line")
+		return nil, errors.New("invalid command line")
+	}
+	err := save_cmdline(&runner, cmdline)
+	if err != nil {
+		return nil, err
 	}
 	runner.Process = exec.Command(cmdline[0])
 	runner.Process.Args = cmdline
-	stdout, err := open_file(workdir, nettest_name, "stdout")
+	runner.Workdir = workdir
+	stdout, err := open_file(&runner, "stdout")
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
 	runner.StdoutPath = stdout.Name()
 	runner.Process.Stdout = stdout
-	stderr, err := open_file(workdir, nettest_name, "stderr")
+	stderr, err := open_file(&runner, "stderr")
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
 	runner.StderrPath = stderr.Name()
 	runner.Process.Stderr = stderr
 	err = runner.Process.Start()
 	if err != nil {
-		return runner, err
+		return nil, err
 	}
+	runner.Timestamp = time.Now()
 	runner.Status = "running"
-	return runner, nil
+	return &runner, nil
 }
 
-func RunnerWaitAsync(runner Runner, timeout time.Duration,
-	periodic func(Runner)) chan error {
+func RunnerWaitAsync(runner *Runner, timeout time.Duration,
+	periodic func()) chan error {
 	done := make(chan error, 1)
 	// See: <http://stackoverflow.com/a/11886829>
 	internal := make(chan error, 1)
 	go func() {
 		internal <- runner.Process.Wait()
 	}()
-	begin := time.Now()
 again:
-	periodic(runner)
+	periodic()
 	select {
 	case <-time.After(1.0 * time.Second):
-		delta := time.Since(begin)
+		delta := time.Since(runner.Timestamp)
 		if delta < timeout {
 			goto again
 		}
@@ -88,9 +109,13 @@ again:
 		}
 		done <- err
 	case err := <-internal:
-		runner.Status = "exited"
+		if err == nil {
+			runner.Status = "succeded"
+		} else {
+			runner.Status = "failed"
+		}
 		done <- err
 	}
-	periodic(runner)
+	periodic()
 	return done
 }

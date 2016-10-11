@@ -23,9 +23,10 @@ _testmain.go
 *.test
 *.prof
 
-# The final executable
+# Other files we generate
 /neubot
 /src/github.com
+*.sqlite
 
 # Annoying sys-specific files
 .DS_Store

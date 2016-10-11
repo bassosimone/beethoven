@@ -18,6 +18,10 @@ func DefaultWorkdir() string {
 	return filepath.Join(DefaultNeubotHome(), "data")
 }
 
+func DefaultMeasurementsDb() string {
+	return filepath.Join(DefaultNeubotHome(), "measurements.sqlite")
+}
+
 func DefaultProcTimeout() time.Duration {
 	return 60.0 * time.Second
 }
