@@ -3,6 +3,6 @@
 Beethoven is an experimental Neubot director.
 
 ```
-GOPATH=`pwd` go get neubot
-GOPATH=`pwd` go build neubot
+GOPATH=`pwd` go get -v neubot
+./bin/neubot
 ```

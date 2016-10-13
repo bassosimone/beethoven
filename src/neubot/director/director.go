@@ -35,7 +35,7 @@ func DirectorWaitAsync(runner *Runner, callback func()) chan error {
 		if err != nil {
 			log.Printf("Command failed: %s\n", err)
 		}
-		err2 := MeasurementsAppend(runner)
+		err2 := MeasurementsAppend(&runner.M)
 		if err == nil && err2 != nil {
 			err = err2
 		}

@@ -26,7 +26,8 @@ _testmain.go
 # Other files we generate
 /neubot
 /src/github.com
-*.sqlite
+/bin/
+/var/lib/neubot/measurements.bolt.db
 
 # Annoying sys-specific files
 .DS_Store

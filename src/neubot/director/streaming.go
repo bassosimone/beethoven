@@ -8,9 +8,9 @@ import (
 )
 
 func StreamingOpenStderr(runner *Runner) (*os.File, error) {
-	filep, err := os.Open(runner.StderrPath)
+	filep, err := os.Open(runner.M.StderrPath)
 	if err != nil {
-		log.Printf("cannot open: %s", runner.StderrPath)
+		log.Printf("cannot open: %s", runner.M.StderrPath)
 		return nil, err
 	}
 	return filep, nil

@@ -1,15 +1,27 @@
 package director
 
 import (
-	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/boltdb/bolt"
+	"encoding/json"
 	"log"
 	"neubot/common"
+	"time"
 )
 
-func MeasurementsAppend(runner *Runner) error {
+type Measurement struct {
+	Status     string
+	StdoutPath string
+	StderrPath string
+	Timestamp  time.Time
+	TestName   string
+	TestId     string
+	Workdir    string
+	CmdLine    []byte
+}
 
-	database, err := sql.Open("sqlite3", common.DefaultMeasurementsDb())
+func MeasurementsAppend(measurement *Measurement) error {
+
+	database, err := bolt.Open(common.DefaultMeasurementsDb(), 0600, nil)
 	if err != nil {
 		return err
 	}
@@ -17,35 +29,30 @@ func MeasurementsAppend(runner *Runner) error {
 
 	log.Printf("database %s openned\n", common.DefaultMeasurementsDb())
 
-	_, err = database.Exec(`
-		CREATE TABLE IF NOT EXISTS measurements(
-			id INTEGER PRIMARY KEY,
-			timestamp NUMBER,
-			test_name TEXT,
-			status TEXT,
-			test_id TEXT,
-			stderr_path TEXT,
-			stdout_path TEXT,
-			workdir TEXT,
-			cmd_line TEXT);`)
-	if err != nil {
-		log.Printf("cannot create table: %s\n", err)
-		return err
-	}
-
-	log.Printf("table 'measurements' created if not exists\n")
-
-	_, err = database.Exec(`
-		INSERT INTO measurements(id, timestamp, test_name, status,
-			test_id, stderr_path, stdout_path, workdir, cmd_line) VALUES(
-			NULL, ?, ?, ?, ?, ?, ?, ?, ?);`,
-		runner.Timestamp.Unix(), runner.TestName,
-		runner.Status, runner.TestId, runner.StderrPath, runner.StdoutPath,
-		runner.Workdir, runner.CmdLine)
-	if err != nil {
-		log.Printf("cannot append to database: %s\n", err)
-		return err
-	}
+	database.Update(func (tx *bolt.Tx) error {
+		bucket, err := tx.CreateBucketIfNotExists([]byte("Measurements"))
+		if err != nil {
+			log.Printf("failed to create bucket")
+			return err
+		}
+		value, err := json.Marshal(measurement)
+		if err != nil {
+			log.Printf("failed to marshal measurement value")
+			return err
+		}
+		key, err := json.Marshal(measurement.Timestamp.Unix())
+		if err != nil {
+			log.Printf("failed to marshal measurement key")
+			return err
+		}
+		log.Printf("about to put measurement: %s => %s", key, value)
+		err = bucket.Put(key, value)
+		if err != nil {
+			log.Printf("failed to put measurement in database")
+			return err
+		}
+		return nil
+	})
 
 	log.Printf("measurement appended to database\n")
 	return nil
