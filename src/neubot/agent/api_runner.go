@@ -43,9 +43,6 @@ func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO: make sure (atomically) that we cannot run more than
-	// one test at a time
-
 	dir := director.Get(common.DefaultNeubotHome())
 
 	runner, err := dir.Start(test_name, settings);
