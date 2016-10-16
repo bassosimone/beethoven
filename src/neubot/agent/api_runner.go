@@ -46,8 +46,9 @@ func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 	// TODO: make sure (atomically) that we cannot run more than
 	// one test at a time
 
-	runner, err := director.DirectorStart(common.DefaultNeubotHome(),
-		test_name, settings);
+	dir := director.Get(common.DefaultNeubotHome())
+
+	runner, err := dir.Start(test_name, settings);
 	if err != nil {
 		log.Printf("cannot start the selected test")
 		WriteResponseJson(w, 500, EmptyJson)
@@ -55,17 +56,17 @@ func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if streaming == 0 {
-		go func() { <-director.DirectorWaitAsync(runner, func() {}) }()
+		go func() { <-dir.WaitAsync(runner, func() {}) }()
 		WriteResponseJson(w, 200, EmptyJson)
 		return
 	}
 
 	// Implementation of test's standard error streaming
 
-	stderr, err := director.StreamingOpenStderr(runner)
+	stderr, err := dir.OpenStderr(runner)
 	if err != nil {
 		log.Printf("cannot open test standard error")
-		go func() { <-director.DirectorWaitAsync(runner, func() {}) }()
+		go func() { <-dir.WaitAsync(runner, func() {}) }()
 		WriteResponseJson(w, 500, EmptyJson)
 		return
 	}
@@ -75,8 +76,8 @@ func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Transfer-Encoding", "chunked")
 
 	log.Printf("start streaming test stderr")
-	channel := director.DirectorWaitAsync(runner, func() {
-		director.StreamingForward(stderr, w)
+	channel := dir.WaitAsync(runner, func() {
+		dir.Forward(stderr, w)
 		// Note: be cautious here because it's not granted that all
 		// available response handler would be flushers. Note that
 		// this implies that, if the handler does not implement the
