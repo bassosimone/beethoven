@@ -2,10 +2,24 @@ package agent
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 )
+
+var EmptyJson = []byte("{}")
+
+func WriteResponseJson(w http.ResponseWriter, code int, body []byte) error {
+	w.WriteHeader(code)
+	w.Header().Set("Content-Type", "application/json; encoding=utf-8")
+	_, err := w.Write(body)
+	if err != nil {
+		log.Printf("cannot write http response body")
+		return err
+	}
+	return nil
+}
 
 func GetTest(r *http.Request) (string, error) {
 	value, exists := r.URL.Query()["test"]

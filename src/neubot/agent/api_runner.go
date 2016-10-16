@@ -1,37 +1,92 @@
 package agent
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"neubot/common"
 	"neubot/director"
 )
 
-func ApiRunnerGet(r *http.Request) (int, string) {
+const MaximumBodyLength = 1024 * 1024 * 1024
+
+func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 	test_name, err := GetTest(r)
 	if err != nil {
-		return 500, "{}"
+		WriteResponseJson(w, 500, EmptyJson)
+		return
 	}
 	log.Printf("test name: %s", test_name)
 
-	settings := make(map[string]string)
-	// TODO: check whether we have settings in the body
+	streaming, err := GetOptionalInt(r, "streaming", 0)
+	if err != nil {
+		WriteResponseJson(w, 500, EmptyJson)
+		return
+	}
+	log.Printf("streaming: %s", streaming)
 
-	// TODO: make sure no more than one test can run at once
+	settings := make(map[string]string)
+	reader := http.MaxBytesReader(w, r.Body, MaximumBodyLength)
+	request_body, err := ioutil.ReadAll(reader)
+	if err != nil {
+		log.Printf("cannot read request body")
+		WriteResponseJson(w, 500, EmptyJson)
+		return
+	}
+	if len(request_body) > 0 {
+		err := json.Unmarshal(request_body, &settings)
+		if err != nil {
+			log.Printf("cannot unmarshal request body")
+			WriteResponseJson(w, 500, EmptyJson)
+			return
+		}
+	}
+
+	// TODO: make sure (atomically) that we cannot run more than
+	// one test at a time
 
 	runner, err := director.DirectorStart(common.DefaultNeubotHome(),
 		test_name, settings);
 	if err != nil {
-		return 500, "{}"
+		log.Printf("cannot start the selected test")
+		WriteResponseJson(w, 500, EmptyJson)
+		return
 	}
 
+	if streaming == 0 {
+		go func() { <-director.DirectorWaitAsync(runner, func() {}) }()
+		WriteResponseJson(w, 200, EmptyJson)
+		return
+	}
 
-	go func() {
-		channel := director.DirectorWaitAsync(runner, func() {
-			// XXX: not simple to do streaming here, perhaps it would otherwise
-			// make sense to do streaming using another API
-		})
-		_ = <-channel
-	}()
-	return 200, "{}"
+	// Implementation of test's standard error streaming
+
+	stderr, err := director.StreamingOpenStderr(runner)
+	if err != nil {
+		log.Printf("cannot open test standard error")
+		go func() { <-director.DirectorWaitAsync(runner, func() {}) }()
+		WriteResponseJson(w, 500, EmptyJson)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "text/plain; encoding=utf-8")
+	w.Header().Set("Transfer-Encoding", "chunked")
+
+	log.Printf("start streaming test stderr")
+	channel := director.DirectorWaitAsync(runner, func() {
+		director.StreamingForward(stderr, w)
+		// Note: be cautious here because it's not granted that all
+		// available response handler would be flushers. Note that
+		// this implies that, if the handler does not implement the
+		// flusher interface then output would not be seen by the
+		// client until a sufficient amount of bytes has been sent.
+		if flusher, okay := w.(http.Flusher); okay {
+			flusher.Flush()
+		}
+	})
+	<-channel
+	log.Printf("end streaming test stderr")
+	stderr.Close()
 }
