@@ -7,6 +7,6 @@ cd $HOME
 install -d src/github.com/bassosimone
 cd src/github.com/bassosimone
 git clone https://github.com/bassosimone/beethoven
-GOPATH=$HOME go get -v
+GOPATH=$HOME go get -v -u
 $HOME/bin/beethoven
 ```
