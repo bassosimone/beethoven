@@ -1,7 +1,6 @@
 package director
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/nu7hatch/gouuid"
 	"io/ioutil"
@@ -15,12 +14,6 @@ type Runner struct {
 	M          Measurement
 }
 
-func save_cmdline(runner *Runner, cmdline []string) error {
-	s, err := json.Marshal(cmdline)
-	runner.M.CmdLine = s
-	return err
-}
-
 func open_file(runner *Runner, file_type string) (
 	*os.File, error) {
 	prefix := runner.M.TestName + "-" + file_type + "-" + runner.M.TestId
@@ -32,16 +25,13 @@ func open_file(runner *Runner, file_type string) (
 }
 
 func RunnerStart(nettest_name string, cmdline []string, workdir string) (
-	*Runner, error) {
+		*Runner, error) {
 	var runner Runner
 	runner.M.TestName = nettest_name
 	if len(cmdline) == 0 {
 		return nil, errors.New("invalid command line")
 	}
-	err := save_cmdline(&runner, cmdline)
-	if err != nil {
-		return nil, err
-	}
+	runner.M.CmdLine = cmdline
 	runner.Process = exec.Command(cmdline[0])
 	runner.Process.Args = cmdline
 	runner.M.Workdir = workdir

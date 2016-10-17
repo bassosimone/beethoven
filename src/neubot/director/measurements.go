@@ -9,14 +9,14 @@ import (
 )
 
 type Measurement struct {
-	Status     string
-	StdoutPath string
-	StderrPath string
-	Timestamp  time.Time
-	TestName   string
-	TestId     string
-	Workdir    string
-	CmdLine    []byte
+	Status     string      `json:"status"`
+	StdoutPath string      `json:"stdout_path"`
+	StderrPath string      `json:"stderr_path"`
+	Timestamp  time.Time   `json:"time"`
+	TestName   string      `json:"test_name"`
+	TestId     string      `json:"test_id"`
+	Workdir    string      `json:"workdir"`
+	CmdLine    []string    `json:"cmd_line"`
 }
 
 func MeasurementsAppend(measurement *Measurement) error {
