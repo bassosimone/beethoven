@@ -3,7 +3,7 @@ package cmdline
 import (
 	"fmt"
 	"github.com/pborman/getopt"
-	"neubot/agent"
+	"github.com/bassosimone/beethoven/agent"
 	"os"
 )
 

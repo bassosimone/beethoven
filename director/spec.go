@@ -6,7 +6,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
-	"neubot/common"
+	"github.com/bassosimone/beethoven/common"
 	"os"
 	"path/filepath"
 	"regexp"

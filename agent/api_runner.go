@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"neubot/common"
-	"neubot/director"
+	"github.com/bassosimone/beethoven/common"
+	"github.com/bassosimone/beethoven/director"
 )
 
 const MaximumBodyLength = 1024 * 1024 * 1024

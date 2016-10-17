@@ -4,7 +4,7 @@ import (
 	"github.com/boltdb/bolt"
 	"encoding/json"
 	"log"
-	"neubot/common"
+	"github.com/bassosimone/beethoven/common"
 	"time"
 )
 

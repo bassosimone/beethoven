@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 	"log"
-	"neubot/common"
+	"github.com/bassosimone/beethoven/common"
 	"os"
 	"sync"
 )

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"neubot/cmdline"
-	"neubot/common"
+	"github.com/bassosimone/beethoven/cmdline"
+	"github.com/bassosimone/beethoven/common"
 	"os"
 	"time"
 )

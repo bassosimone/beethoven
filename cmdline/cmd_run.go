@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/pborman/getopt"
 	"log"
-	"neubot/common"
-	"neubot/director"
+	"github.com/bassosimone/beethoven/common"
+	"github.com/bassosimone/beethoven/director"
 	"os"
 	"strings"
 )
