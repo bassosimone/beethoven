@@ -1,8 +1,12 @@
 # Beethoven
 
-Beethoven is an experimental Neubot director.
+Beethoven is an experimental Neubot client.
 
 ```
-GOPATH=`pwd` go get -v neubot
-./bin/neubot
+cd $HOME
+install -d src/github.com/bassosimone
+cd src/github.com/bassosimone
+git clone https://github.com/bassosimone/beethoven
+GOPATH=$HOME go get -v
+$HOME/bin/beethoven
 ```
