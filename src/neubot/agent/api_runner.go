@@ -19,7 +19,7 @@ func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("test name: %s", test_name)
 
-	streaming, err := GetOptionalInt(r, "streaming", 0)
+	streaming, err := GetOptionalInt64(r, "streaming", 0)
 	if err != nil {
 		WriteResponseJson(w, 500, EmptyJson)
 		return

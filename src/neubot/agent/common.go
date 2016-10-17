@@ -40,7 +40,8 @@ func GetTest(r *http.Request) (string, error) {
 	return test, nil
 }
 
-func GetOptionalInt(r *http.Request, name string, def_value int) (int, error) {
+func GetOptionalInt64(r *http.Request, name string, def_value int64) (
+		int64, error) {
 	value, exists := r.URL.Query()[name]
 	if !exists {
 		return def_value, nil
@@ -56,7 +57,7 @@ func GetOptionalInt(r *http.Request, name string, def_value int) (int, error) {
 	if !matched {
 		return 0, errors.New("regexp does not match")
 	}
-	number, err := strconv.Atoi(single_value)
+	number, err := strconv.ParseInt(single_value, 0, 64)
 	if err != nil {
 		return 0, errors.New("strconv failed")
 	}
