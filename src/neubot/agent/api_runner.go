@@ -11,7 +11,7 @@ import (
 
 const MaximumBodyLength = 1024 * 1024 * 1024
 
-func ApiRunnerGet(w http.ResponseWriter, r *http.Request) {
+func ApiRunner(w http.ResponseWriter, r *http.Request) {
 	test_name, err := GetTest(r)
 	if err != nil {
 		WriteResponseJson(w, 500, EmptyJson)
