@@ -9,7 +9,7 @@ import (
 )
 
 type StateCtx struct {
-	Current int64  `json:"t"`
+	T       int64  `json:"t"`
 	Pid     int    `json:"pid"`
 	Since   int64  `json:"since"`
 }
@@ -21,7 +21,7 @@ type StateHandler struct {
 
 func NewStateHandler() *StateHandler {
 	var handler StateHandler
-	handler.Internal.Current = 1 // So the client starts outdated
+	handler.Internal.T = 1 // So the client starts outdated
 	handler.Internal.Pid = os.Getpid()
 	handler.Internal.Since = time.Now().Unix()
 	handler.Channel = make(chan bool)
@@ -61,7 +61,7 @@ func (self *StateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if latest >= self.Internal.Current {
+	if latest >= self.Internal.T {
 		self.WaitForChanges()
 	}
 
