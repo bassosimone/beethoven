@@ -9,7 +9,7 @@ import (
 	"github.com/bassosimone/beethoven/director"
 )
 
-const MaximumBodyLength = 1024 * 1024 * 1024
+const MaximumBodyLength = 10 * 1024 * 1024
 
 func ApiRunner(w http.ResponseWriter, r *http.Request) {
 	test_name, err := GetTest(r)
